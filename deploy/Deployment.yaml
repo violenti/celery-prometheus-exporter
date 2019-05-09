@@ -7,7 +7,7 @@ metadata:
     "name": "celery-exporter-api"
   namespace: monitoring
   annotations:
-    moni.description: "celery-exporter"
+    app.description: "celery-exporter"
 spec:
   selector:
       k8s-app: celery-exporter-api
@@ -21,8 +21,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    moni.app: celery-exporter-api
-    moni.description: "celery-exporter-api"
+    app.app: celery-exporter-api
+    app.description: "celery-exporter-api"
   labels:
     k8s-app: celery-exporter-api
   name: celery-exporter-api
