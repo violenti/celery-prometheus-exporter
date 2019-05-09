@@ -1,0 +1,63 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: celery-exporter-api
+  labels:
+    "name": "celery-exporter-api"
+  namespace: monitoring
+  annotations:
+    moni.description: "celery-exporter"
+spec:
+  selector:
+      k8s-app: celery-exporter-api
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8888
+    targetPort: 8888
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    moni.app: celery-exporter-api
+    moni.description: "celery-exporter-api"
+  labels:
+    k8s-app: celery-exporter-api
+  name: celery-exporter-api
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: celery-exporter-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: celery-exporter-api
+    spec:
+      containers:
+      - name: celery-exporter-api
+        env:
+          - name: BROKER_URL
+            valueFrom:
+              secretKeyRef:
+                key: redis
+                name: redis-host
+        ports:
+          - containerPort: 8888
+        image: zerok/celery-prometheus-exporter:1.6.0-celery4
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "50m"
+          limits:
+            memory: "200Mi"
+            cpu: "75"
